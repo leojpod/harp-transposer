@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "git@github.com:leojpod/harp-transposer.git",
   "author": "Leo jPod <leo.jpod@lilo.org>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "elm-tooling": "^1.14.0"
+  }
 }

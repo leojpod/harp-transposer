@@ -4,3 +4,4 @@ elm-stuff
 repl-temp-*
 .direnv/
 node_modules/
+yarn.lock

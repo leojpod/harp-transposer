@@ -13,7 +13,6 @@ mkShell {
     elmPackages.elm
     elmPackages.lamdera
     elmPackages.elm-format
-    elmPackages.elm-test-rs
     elmPackages.elm-review
     nodejs-18_x
     yarn
