@@ -16,6 +16,7 @@ mkShell {
     elmPackages.elm-test-rs
     elmPackages.elm-review
     nodejs-18_x
+    yarn
   ] ++ (if pkgs.system == "x86_64-darwin" then [] else [inotify-tools]);
 
   shellHook = ''
