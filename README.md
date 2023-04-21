@@ -2,13 +2,22 @@
 
 Version 1: no backend thing
 
-- [ ] model the harmonica holes/bends/overblows
-- [ ] model the chromatic scale
+- [X] model the harmonica holes/bends/overblows
+- [X] model the chromatic scale
 - [ ] model the positions (link hole to a musical interval)
-  - 1st, 2nd, 3rd only
+  - [X] 1st,
+  - [X] 2nd,
+  - [ ] 3rd only
 - [ ] make a parser to identify the notation in a text box
+    - [X] Parser
+    - [ ] UI
 - [ ] translate from one position to another
-
+  - [ ] function to create candidates
+  - [ ] UI to select the alternatives
+    - [ ] option to apply selection globally
+- [ ] octave transformer 
+  - translate from one position to the same
+  - [ ] selector to choose the direction
 
 # How to model the harmonica layout
 

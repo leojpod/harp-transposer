@@ -11,11 +11,11 @@ mkShell {
   # local environment.
   buildInputs = [
     elmPackages.elm
-    elmPackages.lamdera
     elmPackages.elm-format
+    elmPackages.elm-json
+    elmPackages.elm-test
     elmPackages.elm-review
     nodejs-18_x
-    yarn
   ] ++ (if pkgs.system == "x86_64-darwin" then [] else [inotify-tools]);
 
   shellHook = ''
