@@ -5,3 +5,5 @@ repl-temp-*
 .direnv/
 node_modules/
 yarn.lock
+.parcel-cache/
+dist/

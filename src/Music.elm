@@ -1,4 +1,17 @@
-module Music exposing (..)
+module Music exposing
+    ( Chromatic
+    , HarmonicaNote
+    , Position
+    , TransposedLick
+    , TransposedLickElement(..)
+    , WrittenLick
+    , firstPosition
+    , noteToString
+    , parseLick
+    , secondPosition
+    , transpose
+    , writtenLickToString
+    )
 
 import Browser exposing (element)
 import Parser exposing ((|.), (|=), oneOf, succeed)
@@ -189,8 +202,8 @@ allNotes =
 
 
 type alias Position =
-    { to : HarmonicaNote -> Chromatic
-    , from : Chromatic -> List HarmonicaNote
+    { toChromatic : HarmonicaNote -> Chromatic
+    , fromChromatic : Chromatic -> List HarmonicaNote
     }
 
 
@@ -225,8 +238,8 @@ singleNoteParser revElements =
                 (\_ ->
                     Parser.Done <| List.reverse revElements
                 )
-        , drawNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements))
-        , blowNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements))
+        , Parser.backtrackable (drawNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements)))
+        , Parser.backtrackable (blowNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements)))
         , annotationParser |> Parser.map (\annotation -> Parser.Loop (Annotation annotation :: revElements))
         ]
 
@@ -443,8 +456,11 @@ parseOver =
 
 annotationParser : Parser.Parser String
 annotationParser =
-    Parser.getChompedString <|
-        Parser.chompWhile (\c -> not (Char.isDigit c || c == '-' || c == '+'))
+    Parser.getChompedString
+        (Parser.succeed ()
+            |. Parser.chompIf (\_ -> True)
+            |. Parser.chompWhile (\c -> not (Char.isDigit c || c == '-' || c == '+'))
+        )
 
 
 writtenLickToString : WrittenLick -> String
@@ -463,7 +479,7 @@ writtenLickToString =
 
 firstPosition : Position
 firstPosition =
-    { to =
+    { toChromatic =
         \note ->
             case note of
                 B1o ->
@@ -582,7 +598,7 @@ firstPosition =
 
                 D10o ->
                     C2b
-    , from =
+    , fromChromatic =
         \chromatic ->
             case chromatic of
                 C1 ->
@@ -625,7 +641,7 @@ firstPosition =
 
 secondPosition : Position
 secondPosition =
-    { to =
+    { toChromatic =
         \note ->
             case note of
                 B1o ->
@@ -744,7 +760,7 @@ secondPosition =
 
                 D10o ->
                     C5b
-    , from =
+    , fromChromatic =
         \chromatic ->
             case chromatic of
                 C1 ->
@@ -783,3 +799,33 @@ secondPosition =
                 C7 ->
                     [ D2b, B5o, B9b ]
     }
+
+
+type alias TransposedLick =
+    List TransposedLickElement
+
+
+type TransposedLickElement
+    = NoteOptions { options : List HarmonicaNote, selected : Maybe HarmonicaNote }
+    | Annotation_ String
+
+
+transpose : Position -> Position -> WrittenLick -> TransposedLick
+transpose from to =
+    List.map
+        (\element ->
+            case element of
+                HarmonicaNote note ->
+                    NoteOptions
+                        { options = transposeNote from to note
+                        , selected = Nothing
+                        }
+
+                Annotation annotation ->
+                    Annotation_ annotation
+        )
+
+
+transposeNote : Position -> Position -> HarmonicaNote -> List HarmonicaNote
+transposeNote { toChromatic } { fromChromatic } note =
+    toChromatic note |> fromChromatic
