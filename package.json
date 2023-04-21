@@ -10,12 +10,16 @@
     "elm-tooling": "^1.14.0"
   },
   "devDependencies": {
+    "@parcel/transformer-elm": "^2.8.3",
+    "elm": "^0.19.1-5",
     "elm-tailwind-modules": "^0.5.0",
+    "parcel": "^2.8.3",
     "postcss": "^8.4.23",
     "prettier": "^2.8.7",
     "tailwindcss": "^3.3.1"
   },
   "scripts": {
+    "start": "npx parcel src/index.html",
     "css:gen": "npx elm-tailwind-modules --dir ./gen --tailwind-config tailwind.config.js"
   },
   "author": "",

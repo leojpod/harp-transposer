@@ -3,8 +3,8 @@ module.exports = {
   content: [],
   theme: {
     extend: {},
-    variants: {}
+    variants: {},
   },
+  variants: [],
   plugins: [],
-}
-
+};

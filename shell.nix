@@ -19,7 +19,7 @@ mkShell {
   ] ++ (if pkgs.system == "x86_64-darwin" then [] else [inotify-tools]);
 
   shellHook = ''
-    export PATH="${toString ./assets/node_modules/.bin}:$HOME/.npm-global/bin:$PATH"
+    export PATH="${toString ./node_modules/.bin}:$HOME/.npm-global/bin:$PATH"
     '';
 }
 
