@@ -1,3 +1,3 @@
-import { Elm } from "./Main.elm";
+import { Elm } from "./HarpTransposer.elm";
 
-Elm.Main.init({ flags: {} });
+Elm.HarpTransposer.init({ flags: {} });

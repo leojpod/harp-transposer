@@ -14,8 +14,10 @@
             "elm/parser": "1.1.0",
             "elm-community/list-extra": "8.7.0",
             "elm-community/maybe-extra": "5.3.0",
+            "ken-matsui/html-styled-extra": "1.0.0",
             "matheus23/elm-tailwind-modules-base": "1.0.0",
-            "rtfeldman/elm-css": "18.0.0"
+            "pzp1997/assoc-list": "1.0.0",
+            "rtfeldman/elm-css": "17.1.1"
         },
         "indirect": {
             "elm/time": "1.0.0",

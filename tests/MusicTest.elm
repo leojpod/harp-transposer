@@ -1,9 +1,7 @@
 module MusicTest exposing (all)
 
 import Expect
-import Fuzz
-import List.Extra as List
-import Music exposing (HarmonicaNote, WrittenLick, parseLick)
+import Music exposing (parseLick)
 import Test exposing (Test, describe, test)
 
 
@@ -18,6 +16,7 @@ lickParser =
     describe "Test lib parsing"
         [ everySingleNote
         , simpleLickParsing
+        , alternativesNotationParsing
         ]
 
 
@@ -45,6 +44,46 @@ simpleLickParsing =
                 , Music.Annotation " "
                 , Music.HarmonicaNote Music.B6
                 , Music.Annotation " oh yeah"
+                ]
+        ]
+
+
+alternativesNotationParsing : Test
+alternativesNotationParsing =
+    describe "Simple examples of alternative notation parsing"
+        [ simpleTest "simple single note" "4B" <| Ok [ Music.HarmonicaNote Music.B4 ]
+        , simpleTest "single draw note" "4D" <| Ok [ Music.HarmonicaNote Music.D4 ]
+        , simpleTest "with a bend" "3D'" <| Ok [ Music.HarmonicaNote Music.D3b ]
+        , simpleTest "with a bigger bend" "3D’’’" <| Ok [ Music.HarmonicaNote Music.D3bbb ]
+        , simpleTest "only gibberish" "whatever" <| Ok [ Music.Annotation "whatever" ]
+        , simpleTest "2 blows" "3B 4B" <| Ok [ Music.HarmonicaNote Music.B3, Music.Annotation " ", Music.HarmonicaNote Music.B4 ]
+        , simpleTest "2 draws" "3D 4D" <| Ok [ Music.HarmonicaNote Music.D3, Music.Annotation " ", Music.HarmonicaNote Music.D4 ]
+        , simpleTest "a blues lick" "2D 3D’’ 4B 4D' 4D 6B oh yeah" <|
+            Ok
+                [ Music.HarmonicaNote Music.D2
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.D3bb
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.B4
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.D4b
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.D4
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.B6
+                , Music.Annotation " oh yeah"
+                ]
+        , simpleTest "mixing both notation" "-3 3D' +4 5B 4D'" <|
+            Ok
+                [ Music.HarmonicaNote Music.D3
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.D3b
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.B4
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.B5
+                , Music.Annotation " "
+                , Music.HarmonicaNote Music.D4b
                 ]
         ]
 

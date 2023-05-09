@@ -1,19 +1,23 @@
 module Music exposing
     ( Chromatic
-    , HarmonicaNote
+    , HarmonicaNote(..)
+    , LickElement(..)
     , Position
     , TransposedLick
     , TransposedLickElement(..)
+    , TransposedNote
     , WrittenLick
     , firstPosition
     , noteToString
     , parseLick
     , secondPosition
+    , thirdPosition
     , transpose
     , writtenLickToString
     )
 
 import Browser exposing (element)
+import Html exposing (param)
 import Parser exposing ((|.), (|=), oneOf, succeed)
 
 
@@ -238,86 +242,111 @@ singleNoteParser revElements =
                 (\_ ->
                     Parser.Done <| List.reverse revElements
                 )
+        , Parser.backtrackable (alternativeDrawNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements)))
+        , Parser.backtrackable (alternativeBlowNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements)))
         , Parser.backtrackable (drawNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements)))
         , Parser.backtrackable (blowNoteParser |> Parser.map (\note -> Parser.Loop (HarmonicaNote note :: revElements)))
         , annotationParser |> Parser.map (\annotation -> Parser.Loop (Annotation annotation :: revElements))
         ]
 
 
+alternativeDrawNoteParser : Parser.Parser HarmonicaNote
+alternativeDrawNoteParser =
+    Parser.succeed HoleAndAlterations
+        |= parseHole
+        |. Parser.symbol "D"
+        |= parseAlteration
+        |> Parser.andThen
+            drawNoteFromHoleAndAlteration
+
+
 drawNoteParser : Parser.Parser HarmonicaNote
 drawNoteParser =
-    succeed identity
+    Parser.succeed identity
         |. Parser.symbol "-"
         |= parserHoleAndAlteration
         |> Parser.andThen
-            (\{ hole, alteration } ->
-                case ( hole, alteration ) of
-                    ( 1, None ) ->
-                        Parser.succeed D1
+            drawNoteFromHoleAndAlteration
 
-                    ( 1, Bend 1 ) ->
-                        Parser.succeed D1b
 
-                    ( 2, None ) ->
-                        Parser.succeed D2
+drawNoteFromHoleAndAlteration : HoleAndAlterations -> Parser.Parser HarmonicaNote
+drawNoteFromHoleAndAlteration { hole, alteration } =
+    case ( hole, alteration ) of
+        ( 1, None ) ->
+            Parser.succeed D1
 
-                    ( 2, Bend 1 ) ->
-                        Parser.succeed D2b
+        ( 1, Bend 1 ) ->
+            Parser.succeed D1b
 
-                    ( 2, Bend 2 ) ->
-                        Parser.succeed D2bb
+        ( 2, None ) ->
+            Parser.succeed D2
 
-                    ( 3, None ) ->
-                        Parser.succeed D3
+        ( 2, Bend 1 ) ->
+            Parser.succeed D2b
 
-                    ( 3, Bend 1 ) ->
-                        Parser.succeed D3b
+        ( 2, Bend 2 ) ->
+            Parser.succeed D2bb
 
-                    ( 3, Bend 2 ) ->
-                        Parser.succeed D3bb
+        ( 3, None ) ->
+            Parser.succeed D3
 
-                    ( 3, Bend 3 ) ->
-                        Parser.succeed D3bbb
+        ( 3, Bend 1 ) ->
+            Parser.succeed D3b
 
-                    ( 4, None ) ->
-                        Parser.succeed D4
+        ( 3, Bend 2 ) ->
+            Parser.succeed D3bb
 
-                    ( 4, Bend 1 ) ->
-                        Parser.succeed D4b
+        ( 3, Bend 3 ) ->
+            Parser.succeed D3bbb
 
-                    ( 5, None ) ->
-                        Parser.succeed D5
+        ( 4, None ) ->
+            Parser.succeed D4
 
-                    ( 6, None ) ->
-                        Parser.succeed D6
+        ( 4, Bend 1 ) ->
+            Parser.succeed D4b
 
-                    ( 6, Bend 1 ) ->
-                        Parser.succeed D6b
+        ( 5, None ) ->
+            Parser.succeed D5
 
-                    ( 7, None ) ->
-                        Parser.succeed D7
+        ( 6, None ) ->
+            Parser.succeed D6
 
-                    ( 7, Over ) ->
-                        Parser.succeed D7o
+        ( 6, Bend 1 ) ->
+            Parser.succeed D6b
 
-                    ( 8, None ) ->
-                        Parser.succeed D8
+        ( 7, None ) ->
+            Parser.succeed D7
 
-                    ( 9, None ) ->
-                        Parser.succeed D9
+        ( 7, Over ) ->
+            Parser.succeed D7o
 
-                    ( 9, Over ) ->
-                        Parser.succeed D9o
+        ( 8, None ) ->
+            Parser.succeed D8
 
-                    ( 10, None ) ->
-                        Parser.succeed D10
+        ( 9, None ) ->
+            Parser.succeed D9
 
-                    ( 10, Over ) ->
-                        Parser.succeed D10o
+        ( 9, Over ) ->
+            Parser.succeed D9o
 
-                    _ ->
-                        Parser.problem <| "wrong combination of draw hold and alteration D" ++ String.fromInt hole ++ alterationToString alteration
-            )
+        ( 10, None ) ->
+            Parser.succeed D10
+
+        ( 10, Over ) ->
+            Parser.succeed D10o
+
+        _ ->
+            Parser.problem <| "wrong combination of draw hold and alteration D" ++ String.fromInt hole ++ alterationToString alteration
+
+
+alternativeBlowNoteParser : Parser.Parser HarmonicaNote
+alternativeBlowNoteParser =
+    Parser.succeed HoleAndAlterations
+        |= parseHole
+        |. Parser.symbol "B"
+        |= parseAlteration
+        |> Parser.andThen
+            blowNoteFromHoleAndAlteration
 
 
 blowNoteParser : Parser.Parser HarmonicaNote
@@ -329,65 +358,68 @@ blowNoteParser =
             ]
         |= parserHoleAndAlteration
         |> Parser.andThen
-            (\{ hole, alteration } ->
-                case ( hole, alteration ) of
-                    ( 1, Over ) ->
-                        Parser.succeed B1o
+            blowNoteFromHoleAndAlteration
 
-                    ( 1, None ) ->
-                        Parser.succeed B1
 
-                    ( 2, None ) ->
-                        Parser.succeed B2
+blowNoteFromHoleAndAlteration : HoleAndAlterations -> Parser.Parser HarmonicaNote
+blowNoteFromHoleAndAlteration { hole, alteration } =
+    case ( hole, alteration ) of
+        ( 1, Over ) ->
+            Parser.succeed B1o
 
-                    ( 3, None ) ->
-                        Parser.succeed B3
+        ( 1, None ) ->
+            Parser.succeed B1
 
-                    ( 4, Over ) ->
-                        Parser.succeed B4o
+        ( 2, None ) ->
+            Parser.succeed B2
 
-                    ( 4, None ) ->
-                        Parser.succeed B4
+        ( 3, None ) ->
+            Parser.succeed B3
 
-                    ( 5, Over ) ->
-                        Parser.succeed B5o
+        ( 4, Over ) ->
+            Parser.succeed B4o
 
-                    ( 5, None ) ->
-                        Parser.succeed B5
+        ( 4, None ) ->
+            Parser.succeed B4
 
-                    ( 6, Over ) ->
-                        Parser.succeed B6o
+        ( 5, Over ) ->
+            Parser.succeed B5o
 
-                    ( 6, None ) ->
-                        Parser.succeed B6
+        ( 5, None ) ->
+            Parser.succeed B5
 
-                    ( 7, None ) ->
-                        Parser.succeed B7
+        ( 6, Over ) ->
+            Parser.succeed B6o
 
-                    ( 8, Bend 1 ) ->
-                        Parser.succeed B8b
+        ( 6, None ) ->
+            Parser.succeed B6
 
-                    ( 8, None ) ->
-                        Parser.succeed B8
+        ( 7, None ) ->
+            Parser.succeed B7
 
-                    ( 9, Bend 1 ) ->
-                        Parser.succeed B9b
+        ( 8, Bend 1 ) ->
+            Parser.succeed B8b
 
-                    ( 9, None ) ->
-                        Parser.succeed B9
+        ( 8, None ) ->
+            Parser.succeed B8
 
-                    ( 10, Bend 1 ) ->
-                        Parser.succeed B10b
+        ( 9, Bend 1 ) ->
+            Parser.succeed B9b
 
-                    ( 10, Bend 2 ) ->
-                        Parser.succeed B10bb
+        ( 9, None ) ->
+            Parser.succeed B9
 
-                    ( 10, None ) ->
-                        Parser.succeed B10
+        ( 10, Bend 1 ) ->
+            Parser.succeed B10b
 
-                    _ ->
-                        Parser.problem <| "wrong combination of blow hole and alteration: B" ++ String.fromInt hole ++ alterationToString alteration
-            )
+        ( 10, Bend 2 ) ->
+            Parser.succeed B10bb
+
+        ( 10, None ) ->
+            Parser.succeed B10
+
+        _ ->
+            Parser.problem <| "wrong combination of blow hole and alteration: B" ++ String.fromInt hole ++ alterationToString alteration
 
 
 type Alteration
@@ -419,11 +451,7 @@ parserHoleAndAlteration : Parser.Parser HoleAndAlterations
 parserHoleAndAlteration =
     Parser.succeed HoleAndAlterations
         |= parseHole
-        |= Parser.oneOf
-            [ parseBends |> Parser.map Bend
-            , parseOver |> Parser.map (\_ -> Over)
-            , Parser.succeed None
-            ]
+        |= parseAlteration
 
 
 parseHole : Parser.Parser Int
@@ -440,12 +468,27 @@ parseHole =
             )
 
 
+parseAlteration : Parser.Parser Alteration
+parseAlteration =
+    Parser.oneOf
+        [ parseBends |> Parser.map Bend
+        , parseOver |> Parser.map (\_ -> Over)
+        , Parser.succeed None
+        ]
+
+
 parseBends : Parser.Parser Int
 parseBends =
     Parser.oneOf
         [ Parser.symbol "'''" |> Parser.map (\_ -> 3)
         , Parser.symbol "''" |> Parser.map (\_ -> 2)
         , Parser.symbol "'" |> Parser.map (\_ -> 1)
+        , Parser.symbol "’’’" |> Parser.map (\_ -> 3)
+        , Parser.symbol "’’" |> Parser.map (\_ -> 2)
+        , Parser.symbol "’" |> Parser.map (\_ -> 1)
+        , Parser.symbol "///" |> Parser.map (\_ -> 3)
+        , Parser.symbol "//" |> Parser.map (\_ -> 2)
+        , Parser.symbol "/" |> Parser.map (\_ -> 1)
         ]
 
 
@@ -801,12 +844,181 @@ secondPosition =
     }
 
 
+thirdPosition : Position
+thirdPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C2b
+
+                B1 ->
+                    C7
+
+                D1 ->
+                    C1
+
+                D1b ->
+                    C5
+
+                B2 ->
+                    C2
+
+                D2 ->
+                    C4
+
+                D2b ->
+                    C3
+
+                D2bb ->
+                    C3b
+
+                B3 ->
+                    C4
+
+                D3 ->
+                    C6
+
+                D3b ->
+                    C6b
+
+                D3bb ->
+                    C5
+
+                D3bbb ->
+                    C5b
+
+                B4o ->
+                    C2b
+
+                B4 ->
+                    C7b
+
+                D4 ->
+                    C1
+
+                D4b ->
+                    C7
+
+                B5o ->
+                    C3
+
+                B5 ->
+                    C2
+
+                D5 ->
+                    C3b
+
+                B6o ->
+                    C6b
+
+                B6 ->
+                    C4
+
+                D6 ->
+                    C5
+
+                D6b ->
+                    C5b
+
+                B7 ->
+                    C7b
+
+                D7 ->
+                    C6
+
+                D7o ->
+                    C7
+
+                B8b ->
+                    C2b
+
+                B8 ->
+                    C2
+
+                D8 ->
+                    C1
+
+                B9b ->
+                    C3
+
+                B9 ->
+                    C4
+
+                D9 ->
+                    C3b
+
+                D9o ->
+                    C5b
+
+                B10bb ->
+                    C6b
+
+                B10b ->
+                    C6
+
+                B10 ->
+                    C7b
+
+                D10 ->
+                    C5
+
+                D10o ->
+                    C7
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D1, D4, D8 ]
+
+                C2b ->
+                    [ B1o, B4o, B8b ]
+
+                C2 ->
+                    [ B2, B5, B8 ]
+
+                C3b ->
+                    [ D2bb, D5, D9 ]
+
+                C3 ->
+                    [ D2b, B5o, B9b ]
+
+                C4 ->
+                    [ D2, B6, B9 ]
+
+                C5b ->
+                    [ D3bbb, D6b, D9o ]
+
+                C5 ->
+                    [ D3b, D6, D10 ]
+
+                C6b ->
+                    [ D3b, B6o, B10bb ]
+
+                C6 ->
+                    [ D3, D7, B10b ]
+
+                C7b ->
+                    [ B1, B4, B7, B10 ]
+
+                C7 ->
+                    [ D1b, D4b, D7o, D10o ]
+    }
+
+
 type alias TransposedLick =
     List TransposedLickElement
 
 
+type alias TransposedNote =
+    { original : HarmonicaNote
+    , options : List HarmonicaNote
+    , selected : Maybe HarmonicaNote
+    }
+
+
 type TransposedLickElement
-    = NoteOptions { options : List HarmonicaNote, selected : Maybe HarmonicaNote }
+    = NoteOptions TransposedNote
     | Annotation_ String
 
 
@@ -817,7 +1029,8 @@ transpose from to =
             case element of
                 HarmonicaNote note ->
                     NoteOptions
-                        { options = transposeNote from to note
+                        { original = note
+                        , options = transposeNote from to note
                         , selected = Nothing
                         }
 

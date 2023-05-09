@@ -1,29 +1,34 @@
-# TODO
+# Harp Transposer
 
-Version 1: no backend thing
+## To-do
 
-- [X] model the harmonica holes/bends/overblows
-- [X] model the chromatic scale
+### Version 1: no backend thing
+
+- [x] model the harmonica holes/bends/overblows
+- [x] model the chromatic scale
 - [ ] model the positions (link hole to a musical interval)
-  - [X] 1st,
-  - [X] 2nd,
+  - [x] 1st,
+  - [x] 2nd,
   - [ ] 3rd only
-- [ ] make a parser to identify the notation in a text box
-    - [X] Parser
-    - [ ] UI
+- [x] make a parser to identify the notation in a text box
+  - [x] Parser
+  - [x] UI
 - [ ] translate from one position to another
-  - [ ] function to create candidates
-  - [ ] UI to select the alternatives
+  - [x] function to create candidates
+  - [x] UI to select the alternatives
     - [ ] option to apply selection globally
-- [ ] octave transformer 
+- [ ] octave transformer
   - translate from one position to the same
   - [ ] selector to choose the direction
 
-# How to model the harmonica layout
+### Version 2
 
-What we have: 
+- [ ] Input UI with colour support for recognised harmonica notes
+
+### How to model the harmonica layout
+
+What we have:
 
 - 10 holes, draw/blow
 - some have 1 or more bends, some have blows
 - some have overblows/overdraws
-
