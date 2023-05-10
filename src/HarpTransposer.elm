@@ -408,7 +408,7 @@ viewEditsControl { globalEdits, edits } =
                         [ css
                             [ Tw.flex
                             , Tw.space_x_2
-                            , Tw.p_3
+                            , Tw.p_2
                             , Tw.mr_auto
                             , Tw.text_color Theme.red_500
                             , Tw.bg_color Theme.red_50
