@@ -10,6 +10,7 @@ import Html.Styled.Extra as Html
 import List.Extra as List
 import Maybe.Extra as Maybe
 import Music
+import Tailwind.Breakpoints as Br
 import Tailwind.Theme as Theme
 import Tailwind.Utilities as Tw
 
@@ -206,6 +207,8 @@ view model =
                     , Tw.overflow_y_auto
                     , Tw.h_screen
                     , Tw.w_screen
+                    , Tw.flex
+                    , Tw.flex_wrap
                     ]
                 ]
                 [ Css.Global.global Tw.globalStyles
@@ -222,13 +225,13 @@ pageAttributes =
     css
         [ Tw.bg_gradient_to_br
         , Tw.h_screen
-        , Tw.w_screen
         , Tw.flex
         , Tw.flex_col
         , Tw.snap_always
         , Tw.snap_center
         , Tw.justify_center
         , Tw.items_center
+        , Tw.w_screen
         ]
 
 
@@ -270,6 +273,11 @@ inputPage { content, from } =
             [ Tw.from_color Theme.green_400
             , Tw.to_color Theme.green_50
             , Tw.p_10
+            ]
+        , css
+            [ Br.md
+                [ Tw.w_1over2
+                ]
             ]
         ]
         [ div
@@ -339,6 +347,11 @@ outputPage ({ to } as model) =
             , Tw.to_color Theme.red_50
             , Tw.p_10
             ]
+        , css
+            [ Br.md
+                [ Tw.w_1over2
+                ]
+            ]
         ]
         [ div
             [ css
@@ -346,6 +359,7 @@ outputPage ({ to } as model) =
                 , Tw.flex_col
                 , Tw.flex_grow
                 , Tw.w_full
+                , Tw.h_full
                 , Tw.bg_color Theme.white
                 , Tw.bg_opacity_50
                 , Tw.p_5
@@ -355,8 +369,9 @@ outputPage ({ to } as model) =
             [ h2 [ css [ Tw.text_color Theme.gray_800, Tw.text_2xl ] ] [ text "Output" ]
             , div [ css [] ]
                 [ label [ css [ Tw.flex, Tw.items_center, Tw.space_x_2 ] ]
-                    [ span [] [ text "Targeted position" ] ]
-                , positionSelector to ChangeTo
+                    [ span [] [ text "Targeted position" ]
+                    , positionSelector to ChangeTo
+                    ]
                 ]
             , viewEditsControl model
             , viewTransposedLick model
@@ -366,39 +381,35 @@ outputPage ({ to } as model) =
 
 viewEditsControl : Model -> Html Msg
 viewEditsControl { globalEdits, edits } =
-    div [ css [ Tw.flex, Tw.flex_col, Tw.space_y_2, Tw.text_sm ] ] <|
-        (if Dict.isEmpty globalEdits then
-            []
-
-         else
-            [ h3 [] [ text "global changes" ]
-            , ul [ css [ Tw.flex, Tw.flex_col, Tw.space_y_1, Tw.max_w_max ] ]
-                (globalEdits
-                    |> Dict.toList
-                    |> List.map
-                        (\( from, to ) ->
-                            li [ css [ Tw.flex, Tw.w_full, Tw.justify_between, Tw.items_center, Tw.space_x_2 ] ]
-                                [ span [] [ text <| Music.noteToString from ++ " → " ++ Music.noteToString to ]
-                                , button
-                                    [ css [ Tw.text_color Theme.red_500, Tw.bg_color Theme.red_50, Tw.p_1, Tw.shadow_md, Tw.rounded_xl ]
-                                    , Evt.onClick <| RemoveGlobal from
-                                    ]
-                                    [ text "🗑" ]
-                                ]
+    Html.viewIf (not (Dict.isEmpty globalEdits && Dict.isEmpty edits)) <|
+        div [ css [ Tw.flex, Tw.flex_col, Tw.space_y_4, Tw.text_sm ] ] <|
+            [ Html.viewIf (not <| Dict.isEmpty globalEdits) <|
+                div [ css [ Tw.bg_color Theme.red_50, Tw.p_2, Tw.rounded_xl ] ]
+                    [ h3 [ css [ Tw.text_lg ] ] [ text "global changes" ]
+                    , ul [ css [ Tw.flex, Tw.flex_col, Tw.space_y_1, Tw.max_w_max, Tw.list_disc ] ]
+                        (globalEdits
+                            |> Dict.toList
+                            |> List.map
+                                (\( from, to ) ->
+                                    li [ css [ Tw.flex, Tw.w_full, Tw.justify_between, Tw.items_center, Tw.space_x_2, Tw.pl_4 ] ]
+                                        [ span [] [ text <| Music.noteToString from ++ " → " ++ Music.noteToString to ]
+                                        , button
+                                            [ css [ Tw.text_color Theme.red_500, Tw.bg_color Theme.red_50, Tw.p_1, Tw.shadow_md, Tw.rounded_xl ]
+                                            , Evt.onClick <| RemoveGlobal from
+                                            ]
+                                            [ text "🗑" ]
+                                        ]
+                                )
                         )
-                )
-            ]
-        )
-            ++ (if Dict.isEmpty edits then
-                    []
-
-                else
+                    ]
+            , Html.viewIf (not <| Dict.isEmpty edits) <|
+                div []
                     [ button
                         [ css
                             [ Tw.flex
                             , Tw.space_x_2
                             , Tw.p_3
-                            , Tw.m_auto
+                            , Tw.mr_auto
                             , Tw.text_color Theme.red_500
                             , Tw.bg_color Theme.red_50
                             , Tw.shadow_md
@@ -408,7 +419,7 @@ viewEditsControl { globalEdits, edits } =
                         ]
                         [ text "🗑   Clear local edits" ]
                     ]
-               )
+            ]
 
 
 applyEdits : Dict Music.HarmonicaNote Music.HarmonicaNote -> Dict Int Music.TransposedNote -> Music.TransposedLick -> Music.TransposedLick
@@ -459,18 +470,22 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
                         |> Music.transpose (from |> toMusicPosition) (to |> toMusicPosition)
                         |> applyEdits globalEdits edits
             in
-            div [ css [ Tw.bg_color Theme.white, Tw.whitespace_pre, Tw.p_5, Tw.flex_grow ] ]
-                (candidateLick
-                    |> List.indexedMap
-                        (\index elm ->
-                            case elm of
-                                Music.Annotation_ annotation ->
-                                    span [] [ text annotation ]
+            div [ css [ Tw.bg_color Theme.white, Tw.whitespace_pre, Tw.p_5, Tw.flex_grow, Tw.h_0 ] ]
+                [ div [ css [ Tw.max_h_full, Tw.min_h_0, Tw.overflow_y_scroll ] ]
+                    [ div [ css [ Tw.overflow_y_scroll ] ]
+                        (candidateLick
+                            |> List.indexedMap
+                                (\index elm ->
+                                    case elm of
+                                        Music.Annotation_ annotation ->
+                                            span [] [ text annotation ]
 
-                                Music.NoteOptions note ->
-                                    viewTransposedNote { index = index, editing = editing } note
+                                        Music.NoteOptions note ->
+                                            viewTransposedNote { index = index, editing = editing } note
+                                )
                         )
-                )
+                    ]
+                ]
 
 
 viewTransposedNote : { index : Int, editing : Maybe ( Int, Bool ) } -> Music.TransposedNote -> Html Msg
