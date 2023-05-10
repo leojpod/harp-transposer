@@ -1,4 +1,4 @@
-module HarpTransposer exposing (Flags, Model, main)
+module HarpTransposer exposing (Content, Flags, Model, Msg, Position, main)
 
 import AssocList as Dict exposing (Dict)
 import Browser

@@ -13,11 +13,8 @@ module Music exposing
     , secondPosition
     , thirdPosition
     , transpose
-    , writtenLickToString
     )
 
-import Browser exposing (element)
-import Html exposing (param)
 import Parser exposing ((|.), (|=), oneOf, succeed)
 
 
@@ -200,11 +197,6 @@ noteToString note =
             "-10°"
 
 
-allNotes : List HarmonicaNote
-allNotes =
-    [ B1o, B1, D1, D1b, B2, D2, D2b, D2bb, B3, D3, D3b, D3bb, D3bbb, B4o, B4, D4, D4b, B5o, B5, D5, B6o, B6, D6, D6b, B7, D7, D7o, B8b, B8, D8, B9b, B9, D9, D9o, B10bb, B10b, B10, D10, D10o ]
-
-
 type alias Position =
     { toChromatic : HarmonicaNote -> Chromatic
     , fromChromatic : Chromatic -> List HarmonicaNote
@@ -225,7 +217,7 @@ parseLick lick =
     Parser.run lickParser lick
         |> Result.mapError
             (\deadend ->
-                Parser.deadEndsToString <| Debug.log "deadend? " deadend
+                Parser.deadEndsToString <| deadend
             )
 
 
@@ -504,20 +496,6 @@ annotationParser =
             |. Parser.chompIf (\_ -> True)
             |. Parser.chompWhile (\c -> not (Char.isDigit c || c == '-' || c == '+'))
         )
-
-
-writtenLickToString : WrittenLick -> String
-writtenLickToString =
-    List.map
-        (\element ->
-            case element of
-                Annotation str ->
-                    str
-
-                HarmonicaNote note ->
-                    noteToString note
-        )
-        >> String.join ""
 
 
 firstPosition : Position
