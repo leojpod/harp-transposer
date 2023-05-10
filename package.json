@@ -23,8 +23,7 @@
   "scripts": {
     "start": "npx parcel src/index.html --no-cache",
     "css:gen": "npx elm-tailwind-modules --dir ./gen --tailwind-config tailwind.config.js",
-    "predeploy": "rm -rf dist && parcel build ./*.html --public-url \"https://leojpod.github.io/harp-transposer\"",
-    "deploy": "gh-pages -d dist"
+    "build": "rm -rf dist && parcel build ./*.html --public-url \"https://leojpod.github.io/harp-transposer\""
   },
   "author": "",
   "license": ""
