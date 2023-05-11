@@ -991,7 +991,6 @@ type alias TransposedLick =
 type alias TransposedNote =
     { original : HarmonicaNote
     , options : List HarmonicaNote
-    , selected : Maybe HarmonicaNote
     }
 
 
@@ -1009,7 +1008,6 @@ transpose from to =
                     NoteOptions
                         { original = note
                         , options = transposeNote from to note
-                        , selected = Nothing
                         }
 
                 Annotation annotation ->

@@ -22,7 +22,7 @@ While there might be a dedicated UI to change to another octave directly, for no
   - [x] function to create candidates
   - [x] UI to select the alternatives
     - [x] option to apply selection globally
-  - [ ] Colour feedback to show if a global change/local change has been made.
+  - [x] Colour feedback to show if a global change/local change has been made.
 - [ ] octave transformer
   - translate from one position to the same
   - [ ] selector to choose the direction

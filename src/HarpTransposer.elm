@@ -47,7 +47,7 @@ type alias Model =
     { from : Position
     , to : Position
     , content : Content
-    , edits : Dict Int Music.TransposedNote
+    , edits : Dict Int ( Music.HarmonicaNote, Music.HarmonicaNote )
     , globalEdits : Dict Music.HarmonicaNote Music.HarmonicaNote
     , editing : Maybe ( Int, Bool )
     }
@@ -83,7 +83,7 @@ type Msg
     | ChangeFrom Position
     | ChangeTo Position
     | Edit (Maybe Int)
-    | UpdateTransposedNote Int Music.TransposedNote Bool
+    | UpdateTransposedNoteEdition Int ( Music.HarmonicaNote, Music.HarmonicaNote ) Bool
     | ToggleGlobalEdit Bool
     | RemoveGlobal Music.HarmonicaNote
     | ClearLocalEdits
@@ -154,17 +154,12 @@ update msg model =
             , Cmd.none
             )
 
-        UpdateTransposedNote index updatedNote isGlobal ->
+        UpdateTransposedNoteEdition index ( original, edit ) isGlobal ->
             if isGlobal then
                 ( { model
                     | editing = Nothing
                     , globalEdits =
-                        case updatedNote.selected of
-                            Just selected ->
-                                model.globalEdits |> Dict.insert updatedNote.original selected
-
-                            Nothing ->
-                                model.globalEdits
+                        model.globalEdits |> Dict.insert original edit
                   }
                 , Cmd.none
                 )
@@ -172,7 +167,7 @@ update msg model =
             else
                 ( { model
                     | editing = Nothing
-                    , edits = model.edits |> Dict.insert index updatedNote
+                    , edits = model.edits |> Dict.insert index ( original, edit )
                   }
                 , Cmd.none
                 )
@@ -422,35 +417,81 @@ viewEditsControl { globalEdits, edits } =
             ]
 
 
-applyEdits : Dict Music.HarmonicaNote Music.HarmonicaNote -> Dict Int Music.TransposedNote -> Music.TransposedLick -> Music.TransposedLick
+type alias TransposedLick =
+    List TransposedLickElement
+
+
+type TransposedLickElement
+    = Annotation String
+    | NoteOptions TransposedNote
+
+
+type alias TransposedNote =
+    { original : Music.HarmonicaNote
+    , options : List Music.HarmonicaNote
+    , selection : Selection
+    }
+
+
+type Selection
+    = None
+    | Global Music.HarmonicaNote
+    | Local Music.HarmonicaNote
+
+
+applyEdits : Dict Music.HarmonicaNote Music.HarmonicaNote -> Dict Int ( Music.HarmonicaNote, Music.HarmonicaNote ) -> Music.TransposedLick -> TransposedLick
 applyEdits globals edits =
     List.indexedMap
         (\index transposedElement ->
             case transposedElement of
+                Music.Annotation_ annotation ->
+                    Annotation annotation
+
                 Music.NoteOptions transposedNote ->
                     case ( Dict.get index edits, Dict.get transposedNote.original globals ) of
-                        ( Just edit, Just global ) ->
-                            if transposedNote.original == edit.original then
-                                Music.NoteOptions edit
+                        ( Just ( original, edit ), Just global ) ->
+                            if transposedNote.original == original then
+                                NoteOptions
+                                    { original = original
+                                    , options = transposedNote.options
+                                    , selection = Local edit
+                                    }
 
                             else
-                                Music.NoteOptions { transposedNote | selected = Just global }
+                                NoteOptions
+                                    { original = transposedNote.original
+                                    , options = transposedNote.options
+                                    , selection = Global global
+                                    }
 
-                        ( Just edit, _ ) ->
-                            if transposedNote.original == edit.original then
-                                Music.NoteOptions edit
+                        ( Just ( original, edit ), _ ) ->
+                            if transposedNote.original == original then
+                                NoteOptions
+                                    { original = original
+                                    , options = transposedNote.options
+                                    , selection = Local edit
+                                    }
 
                             else
-                                Music.NoteOptions transposedNote
+                                NoteOptions
+                                    { original = transposedNote.original
+                                    , options = transposedNote.options
+                                    , selection = None
+                                    }
 
                         ( _, Just global ) ->
-                            Music.NoteOptions { transposedNote | selected = Just global }
+                            NoteOptions
+                                { original = transposedNote.original
+                                , options = transposedNote.options
+                                , selection = Global global
+                                }
 
                         _ ->
-                            Music.NoteOptions transposedNote
-
-                _ ->
-                    transposedElement
+                            NoteOptions
+                                { original = transposedNote.original
+                                , options = transposedNote.options
+                                , selection = None
+                                }
         )
 
 
@@ -464,7 +505,7 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
 
         ValidLick { lick } ->
             let
-                candidateLick : Music.TransposedLick
+                candidateLick : TransposedLick
                 candidateLick =
                     lick
                         |> Music.transpose (from |> toMusicPosition) (to |> toMusicPosition)
@@ -476,18 +517,18 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
                         |> List.indexedMap
                             (\index elm ->
                                 case elm of
-                                    Music.Annotation_ annotation ->
+                                    Annotation annotation ->
                                         span [] [ text annotation ]
 
-                                    Music.NoteOptions note ->
+                                    NoteOptions note ->
                                         viewTransposedNote { index = index, editing = editing } note
                             )
                     )
                 ]
 
 
-viewTransposedNote : { index : Int, editing : Maybe ( Int, Bool ) } -> Music.TransposedNote -> Html Msg
-viewTransposedNote { index, editing } ({ original, options, selected } as transposedNote) =
+viewTransposedNote : { index : Int, editing : Maybe ( Int, Bool ) } -> TransposedNote -> Html Msg
+viewTransposedNote { index, editing } ({ original, options, selection } as transposedNote) =
     div
         [ css [ Tw.relative, Tw.text_color Theme.violet_700, Tw.inline_block, Tw.cursor_pointer ]
         ]
@@ -533,10 +574,8 @@ viewTransposedNote { index, editing } ({ original, options, selected } as transp
                                 li
                                     [ css [ Tw.w_full, Tw.bg_color Theme.violet_50, Tw.rounded_xl ]
                                     , Evt.onClick <|
-                                        UpdateTransposedNote index
-                                            { transposedNote
-                                                | selected = Just note
-                                            }
+                                        UpdateTransposedNoteEdition index
+                                            ( transposedNote.original, note )
                                             isGlobal
                                     ]
                                     [ text <| Music.noteToString note ]
@@ -557,17 +596,28 @@ viewTransposedNote { index, editing } ({ original, options, selected } as transp
          else
             []
         )
-            ++ [ div
-                    [ css [ Tw.bg_color Theme.violet_50, Tw.p_1, Tw.rounded_xl ]
+            ++ [ let
+                    ( color, noteStr ) =
+                        case selection of
+                            None ->
+                                options
+                                    |> List.head
+                                    |> Maybe.unwrap
+                                        ( Theme.amber_50, "?" )
+                                        (\note ->
+                                            ( Theme.violet_50, note |> Music.noteToString )
+                                        )
+
+                            Local note ->
+                                ( Theme.emerald_50, note |> Music.noteToString )
+
+                            Global note ->
+                                ( Theme.blue_50, note |> Music.noteToString )
+                 in
+                 div
+                    [ css [ Tw.bg_color color, Tw.p_1, Tw.rounded_xl ]
                     , Evt.onClick <| Edit <| Just index
                     ]
-                    [ selected
-                        |> Maybe.map Just
-                        |> Maybe.withDefault
-                            (options
-                                |> List.head
-                            )
-                        |> Maybe.unwrap "‽" Music.noteToString
-                        |> text
+                    [ text noteStr
                     ]
                ]
