@@ -470,21 +470,19 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
                         |> Music.transpose (from |> toMusicPosition) (to |> toMusicPosition)
                         |> applyEdits globalEdits edits
             in
-            div [ css [ Tw.bg_color Theme.white, Tw.whitespace_pre, Tw.p_5, Tw.flex_grow, Tw.h_0 ] ]
-                [ div [ css [ Tw.max_h_full, Tw.min_h_0, Tw.overflow_y_scroll ] ]
-                    [ div [ css [ Tw.overflow_y_scroll ] ]
-                        (candidateLick
-                            |> List.indexedMap
-                                (\index elm ->
-                                    case elm of
-                                        Music.Annotation_ annotation ->
-                                            span [] [ text annotation ]
+            div [ css [ Tw.bg_color Theme.white, Tw.whitespace_pre, Tw.p_5, Tw.flex_grow, Tw.h_0, Tw.overflow_auto ] ]
+                [ div [ css [ Tw.pb_24 ] ]
+                    (candidateLick
+                        |> List.indexedMap
+                            (\index elm ->
+                                case elm of
+                                    Music.Annotation_ annotation ->
+                                        span [] [ text annotation ]
 
-                                        Music.NoteOptions note ->
-                                            viewTransposedNote { index = index, editing = editing } note
-                                )
-                        )
-                    ]
+                                    Music.NoteOptions note ->
+                                        viewTransposedNote { index = index, editing = editing } note
+                            )
+                    )
                 ]
 
 
