@@ -10,7 +10,7 @@ While there might be a dedicated UI to change to another octave directly, for no
 
 - [x] model the harmonica holes/bends/overblows
 - [x] model the chromatic scale
-- [ ] model the positions (link hole to a musical interval)
+- [x] model the positions (link hole to a musical interval)
   - [x] 1st,
   - [x] 2nd,
   - [x] 3rd
@@ -18,7 +18,7 @@ While there might be a dedicated UI to change to another octave directly, for no
 - [x] make a parser to identify the notation in a text box
   - [x] Parser
   - [x] UI
-- [ ] translate from one position to another
+- [x] translate from one position to another
   - [x] function to create candidates
   - [x] UI to select the alternatives
     - [x] option to apply selection globally
@@ -31,6 +31,7 @@ While there might be a dedicated UI to change to another octave directly, for no
 
 - [ ] Change the colours everywhere...
 - [ ] Input UI with colour support for recognised harmonica notes
+- [ ] Easier edition of the translation
 
 ### How to model the harmonica layout
 
