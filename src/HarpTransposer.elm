@@ -23,11 +23,32 @@ type Position
     = FirstPos
     | SecondPos
     | ThirdPos
+    | FourthPos
+    | FifthPos
+    | SixthPos
+    | SeventhPos
+    | EighthPos
+    | NinthPos
+    | TenthPos
+    | EleventhPos
+    | TwelfthPos
 
 
 allPositions : List ( String, Position )
 allPositions =
-    [ ( "1st", FirstPos ), ( "2nd", SecondPos ), ( "3rd", ThirdPos ) ]
+    [ ( "1st", FirstPos )
+    , ( "2nd", SecondPos )
+    , ( "3rd", ThirdPos )
+    , ( "4th", FourthPos )
+    , ( "5th", FifthPos )
+    , ( "6th", SixthPos )
+    , ( "7th", SeventhPos )
+    , ( "8th", EighthPos )
+    , ( "9th", NinthPos )
+    , ( "10th", TenthPos )
+    , ( "11th", EleventhPos )
+    , ( "12th", TwelfthPos )
+    ]
 
 
 toMusicPosition : Position -> Music.Position
@@ -41,6 +62,33 @@ toMusicPosition position =
 
         ThirdPos ->
             Music.thirdPosition
+
+        FourthPos ->
+            Music.fourthPosition
+
+        FifthPos ->
+            Music.fifthPosition
+
+        SixthPos ->
+            Music.sixthPosition
+
+        SeventhPos ->
+            Music.seventhPosition
+
+        EighthPos ->
+            Music.eighthPosition
+
+        NinthPos ->
+            Music.ninthPosition
+
+        TenthPos ->
+            Music.tenthPosition
+
+        EleventhPos ->
+            Music.eleventhPosition
+
+        TwelfthPos ->
+            Music.twelfthPosition
 
 
 type alias Model =

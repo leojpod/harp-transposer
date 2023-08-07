@@ -7,12 +7,21 @@ module Music exposing
     , TransposedLickElement(..)
     , TransposedNote
     , WrittenLick
+    , eighthPosition
+    , eleventhPosition
+    , fifthPosition
     , firstPosition
+    , fourthPosition
+    , ninthPosition
     , noteToString
     , parseLick
     , secondPosition
+    , seventhPosition
+    , sixthPosition
+    , tenthPosition
     , thirdPosition
     , transpose
+    , twelfthPosition
     )
 
 import Parser exposing ((|.), (|=), oneOf, succeed)
@@ -981,6 +990,1464 @@ thirdPosition =
 
                 C7 ->
                     [ D1b, D4b, D7o, D10o ]
+    }
+
+
+fourthPosition : Position
+fourthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C5b
+
+                B1 ->
+                    C3b
+
+                D1 ->
+                    C4
+
+                D1b ->
+                    C3
+
+                B2 ->
+                    C5
+
+                D2 ->
+                    C7b
+
+                D2b ->
+                    C6
+
+                D2bb ->
+                    C6b
+
+                B3 ->
+                    C7b
+
+                D3 ->
+                    C2
+
+                D3b ->
+                    C2b
+
+                D3bb ->
+                    C1
+
+                D3bbb ->
+                    C7
+
+                B4o ->
+                    C5b
+
+                B4 ->
+                    C3b
+
+                D4 ->
+                    C4
+
+                D4b ->
+                    C3
+
+                B5o ->
+                    C6
+
+                B5 ->
+                    C5
+
+                D5 ->
+                    C6b
+
+                B6o ->
+                    C2b
+
+                B6 ->
+                    C7b
+
+                D6 ->
+                    C1
+
+                D6b ->
+                    C7
+
+                B7 ->
+                    C3b
+
+                D7 ->
+                    C2
+
+                D7o ->
+                    C3
+
+                B8b ->
+                    C5b
+
+                B8 ->
+                    C5
+
+                D8 ->
+                    C4
+
+                B9b ->
+                    C6
+
+                B9 ->
+                    C7b
+
+                D9 ->
+                    C6b
+
+                D9o ->
+                    C7
+
+                B10bb ->
+                    C2b
+
+                B10b ->
+                    C2
+
+                B10 ->
+                    C3b
+
+                D10 ->
+                    C1
+
+                D10o ->
+                    C3
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D3bb, D6, D10 ]
+
+                C2b ->
+                    [ D3b, B6o, B10bb ]
+
+                C2 ->
+                    [ D3, D7, B10b ]
+
+                C3b ->
+                    [ B1, B4, B7, B10 ]
+
+                C3 ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C4 ->
+                    [ D1, D4, D8 ]
+
+                C5b ->
+                    [ B1o, B4o, B8b ]
+
+                C5 ->
+                    [ B2, B5, B8 ]
+
+                C6b ->
+                    [ D2bb, D5, D9 ]
+
+                C6 ->
+                    [ D2b, B5o, B9b ]
+
+                C7b ->
+                    [ D2, B3, B6, B9 ]
+
+                C7 ->
+                    [ D3bbb, D6b, D9o ]
+    }
+
+
+fifthPosition : Position
+fifthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C7
+
+                B1 ->
+                    C6b
+
+                D1 ->
+                    C7b
+
+                D1b ->
+                    C6
+
+                B2 ->
+                    C1
+
+                D2 ->
+                    C3b
+
+                D2b ->
+                    C2
+
+                D2bb ->
+                    C2b
+
+                B3 ->
+                    C3b
+
+                D3 ->
+                    C5
+
+                D3b ->
+                    C5b
+
+                D3bb ->
+                    C4
+
+                D3bbb ->
+                    C3
+
+                B4o ->
+                    C7
+
+                B4 ->
+                    C6b
+
+                D4 ->
+                    C7b
+
+                D4b ->
+                    C6
+
+                B5o ->
+                    C2
+
+                B5 ->
+                    C1
+
+                D5 ->
+                    C2b
+
+                B6o ->
+                    C5b
+
+                B6 ->
+                    C3b
+
+                D6 ->
+                    C4
+
+                D6b ->
+                    C3
+
+                B7 ->
+                    C6b
+
+                D7 ->
+                    C5
+
+                D7o ->
+                    C6
+
+                B8b ->
+                    C7
+
+                B8 ->
+                    C1
+
+                D8 ->
+                    C7b
+
+                B9b ->
+                    C2
+
+                B9 ->
+                    C3b
+
+                D9 ->
+                    C2b
+
+                D9o ->
+                    C3
+
+                B10bb ->
+                    C5b
+
+                B10b ->
+                    C5
+
+                B10 ->
+                    C6b
+
+                D10 ->
+                    C4
+
+                D10o ->
+                    C6
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ B2, B5, B8 ]
+
+                C2b ->
+                    [ D2bb, D5, D9 ]
+
+                C2 ->
+                    [ D2b, B5o, B9b ]
+
+                C3b ->
+                    [ D2, B3, B6, B9 ]
+
+                C3 ->
+                    [ D3bbb, D6b, D9o ]
+
+                C4 ->
+                    [ D3bb, D6, D10 ]
+
+                C5b ->
+                    [ D3b, B6o, B10bb ]
+
+                C5 ->
+                    [ D3, D7, B10b ]
+
+                C6b ->
+                    [ B1, B4, B7, B10 ]
+
+                C6 ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C7b ->
+                    [ D1, D4, D8 ]
+
+                C7 ->
+                    [ B1o, B4o, B8b ]
+    }
+
+
+sixthPosition : Position
+sixthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C3
+
+                B1 ->
+                    C2b
+
+                D1 ->
+                    C3b
+
+                D1b ->
+                    C2
+
+                B2 ->
+                    C4
+
+                D2 ->
+                    C6b
+
+                D2b ->
+                    C5
+
+                D2bb ->
+                    C5b
+
+                B3 ->
+                    C6b
+
+                D3 ->
+                    C1
+
+                D3b ->
+                    C7
+
+                D3bb ->
+                    C7b
+
+                D3bbb ->
+                    C6
+
+                B4o ->
+                    C3
+
+                B4 ->
+                    C2b
+
+                D4 ->
+                    C3b
+
+                D4b ->
+                    C2
+
+                B5o ->
+                    C5
+
+                B5 ->
+                    C4
+
+                D5 ->
+                    C5b
+
+                B6o ->
+                    C7
+
+                B6 ->
+                    C6b
+
+                D6 ->
+                    C7b
+
+                D6b ->
+                    C6
+
+                B7 ->
+                    C2b
+
+                D7 ->
+                    C1
+
+                D7o ->
+                    C2
+
+                B8b ->
+                    C3
+
+                B8 ->
+                    C4
+
+                D8 ->
+                    C3b
+
+                B9b ->
+                    C5
+
+                B9 ->
+                    C6b
+
+                D9 ->
+                    C5b
+
+                D9o ->
+                    C6
+
+                B10bb ->
+                    C7
+
+                B10b ->
+                    C1
+
+                B10 ->
+                    C2b
+
+                D10 ->
+                    C7b
+
+                D10o ->
+                    C2
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D3, D7, B10b ]
+
+                C2b ->
+                    [ B1, B4, B7, B10 ]
+
+                C2 ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C3b ->
+                    [ D1, D4, D8 ]
+
+                C3 ->
+                    [ B1o, B4o, B8b ]
+
+                C4 ->
+                    [ B2, B5, B8 ]
+
+                C5b ->
+                    [ D2bb, D5, D9 ]
+
+                C5 ->
+                    [ D2b, B5o, B9b ]
+
+                C6b ->
+                    [ D2, B3, B6, B9 ]
+
+                C6 ->
+                    [ D3bbb, D6b, D9o ]
+
+                C7b ->
+                    [ D3bb, D6, D10 ]
+
+                C7 ->
+                    [ D3b, B6o, B10bb ]
+    }
+
+
+seventhPosition : Position
+seventhPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C6
+
+                B1 ->
+                    C5b
+
+                D1 ->
+                    C6b
+
+                D1b ->
+                    C5
+
+                B2 ->
+                    C7b
+
+                D2 ->
+                    C2b
+
+                D2b ->
+                    C1
+
+                D2bb ->
+                    C7
+
+                B3 ->
+                    C2b
+
+                D3 ->
+                    C4
+
+                D3b ->
+                    C3
+
+                D3bb ->
+                    C3b
+
+                D3bbb ->
+                    C2
+
+                B4o ->
+                    C6
+
+                B4 ->
+                    C5b
+
+                D4 ->
+                    C6b
+
+                D4b ->
+                    C5
+
+                B5o ->
+                    C1
+
+                B5 ->
+                    C7b
+
+                D5 ->
+                    C7
+
+                B6o ->
+                    C3
+
+                B6 ->
+                    C2b
+
+                D6 ->
+                    C3b
+
+                D6b ->
+                    C2
+
+                B7 ->
+                    C5b
+
+                D7 ->
+                    C4
+
+                D7o ->
+                    C5
+
+                B8b ->
+                    C6
+
+                B8 ->
+                    C7b
+
+                D8 ->
+                    C6b
+
+                B9b ->
+                    C1
+
+                B9 ->
+                    C2b
+
+                D9 ->
+                    C7
+
+                D9o ->
+                    C2
+
+                B10bb ->
+                    C3
+
+                B10b ->
+                    C4
+
+                B10 ->
+                    C5b
+
+                D10 ->
+                    C3b
+
+                D10o ->
+                    C5
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D2b, B5o, B9b ]
+
+                C2b ->
+                    [ D2, B3, B6, B9 ]
+
+                C2 ->
+                    [ D3bbb, D6b, D9o ]
+
+                C3b ->
+                    [ D3bb, D6, D10 ]
+
+                C3 ->
+                    [ D3b, B6o, B10bb ]
+
+                C4 ->
+                    [ D3, D7, B10b ]
+
+                C5b ->
+                    [ B1, B4, B7, B10 ]
+
+                C5 ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C6b ->
+                    [ D1, D4, D8 ]
+
+                C6 ->
+                    [ B1o, B4o, B8b ]
+
+                C7b ->
+                    [ B2, B5, B8 ]
+
+                C7 ->
+                    [ D2bb, D5, D9 ]
+    }
+
+
+eighthPosition : Position
+eighthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C2
+
+                B1 ->
+                    C7
+
+                D1 ->
+                    C2b
+
+                D1b ->
+                    C1
+
+                B2 ->
+                    C3b
+
+                D2 ->
+                    C5b
+
+                D2b ->
+                    C4
+
+                D2bb ->
+                    C3
+
+                B3 ->
+                    C5b
+
+                D3 ->
+                    C7b
+
+                D3b ->
+                    C6
+
+                D3bb ->
+                    C6b
+
+                D3bbb ->
+                    C5
+
+                B4o ->
+                    C2
+
+                B4 ->
+                    C7
+
+                D4 ->
+                    C2b
+
+                D4b ->
+                    C1
+
+                B5o ->
+                    C4
+
+                B5 ->
+                    C3b
+
+                D5 ->
+                    C3
+
+                B6o ->
+                    C6
+
+                B6 ->
+                    C5b
+
+                D6 ->
+                    C6b
+
+                D6b ->
+                    C5
+
+                B7 ->
+                    C7
+
+                D7 ->
+                    C7b
+
+                D7o ->
+                    C1
+
+                B8b ->
+                    C2
+
+                B8 ->
+                    C3b
+
+                D8 ->
+                    C2b
+
+                B9b ->
+                    C4
+
+                B9 ->
+                    C5b
+
+                D9 ->
+                    C3
+
+                D9o ->
+                    C5
+
+                B10bb ->
+                    C6
+
+                B10b ->
+                    C7b
+
+                B10 ->
+                    C7
+
+                D10 ->
+                    C6b
+
+                D10o ->
+                    C1
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C2b ->
+                    [ D1, D4, D8 ]
+
+                C2 ->
+                    [ B1o, B4o, B8b ]
+
+                C3b ->
+                    [ B2, B5, B8 ]
+
+                C3 ->
+                    [ D2bb, D5, D9 ]
+
+                C4 ->
+                    [ D2b, B5o, B9b ]
+
+                C5b ->
+                    [ D2, B3, B6, B9 ]
+
+                C5 ->
+                    [ D3bbb, D6b, D9o ]
+
+                C6b ->
+                    [ D3bb, D6, D10 ]
+
+                C6 ->
+                    [ D3b, B6o, B10bb ]
+
+                C7b ->
+                    [ D3, D7, B10b ]
+
+                C7 ->
+                    [ B1, B4, B7, B10 ]
+    }
+
+
+ninthPosition : Position
+ninthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C5
+
+                B1 ->
+                    C3
+
+                D1 ->
+                    C5b
+
+                D1b ->
+                    C4
+
+                B2 ->
+                    C6b
+
+                D2 ->
+                    C7
+
+                D2b ->
+                    C7b
+
+                D2bb ->
+                    C6
+
+                B3 ->
+                    C7
+
+                D3 ->
+                    C3b
+
+                D3b ->
+                    C2
+
+                D3bb ->
+                    C2b
+
+                D3bbb ->
+                    C1
+
+                B4o ->
+                    C5
+
+                B4 ->
+                    C3
+
+                D4 ->
+                    C5b
+
+                D4b ->
+                    C4
+
+                B5o ->
+                    C7b
+
+                B5 ->
+                    C6b
+
+                D5 ->
+                    C6
+
+                B6o ->
+                    C2
+
+                B6 ->
+                    C7
+
+                D6 ->
+                    C2b
+
+                D6b ->
+                    C1
+
+                B7 ->
+                    C3
+
+                D7 ->
+                    C3b
+
+                D7o ->
+                    C4
+
+                B8b ->
+                    C5
+
+                B8 ->
+                    C6b
+
+                D8 ->
+                    C5b
+
+                B9b ->
+                    C7b
+
+                B9 ->
+                    C7
+
+                D9 ->
+                    C6
+
+                D9o ->
+                    C1
+
+                B10bb ->
+                    C2
+
+                B10b ->
+                    C3b
+
+                B10 ->
+                    C3
+
+                D10 ->
+                    C2b
+
+                D10o ->
+                    C4
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D3bbb, D6b, D9o ]
+
+                C2b ->
+                    [ D3bb, D6, D10 ]
+
+                C2 ->
+                    [ D3b, B6o, B10bb ]
+
+                C3b ->
+                    [ D3, D7, B10b ]
+
+                C3 ->
+                    [ B1, B4, B7, B10 ]
+
+                C4 ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C5b ->
+                    [ D1, D4, D8 ]
+
+                C5 ->
+                    [ B1o, B4o, B8b ]
+
+                C6b ->
+                    [ B2, B5, B8 ]
+
+                C6 ->
+                    [ D2bb, D5, D9 ]
+
+                C7b ->
+                    [ D2b, B5o, B9b ]
+
+                C7 ->
+                    [ D2, B3, B6, B9 ]
+    }
+
+
+tenthPosition : Position
+tenthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C1
+
+                B1 ->
+                    C6
+
+                D1 ->
+                    C7
+
+                D1b ->
+                    C7b
+
+                B2 ->
+                    C2b
+
+                D2 ->
+                    C3
+
+                D2b ->
+                    C3b
+
+                D2bb ->
+                    C2
+
+                B3 ->
+                    C3
+
+                D3 ->
+                    C6b
+
+                D3b ->
+                    C5
+
+                D3bb ->
+                    C5b
+
+                D3bbb ->
+                    C4
+
+                B4o ->
+                    C1
+
+                B4 ->
+                    C6
+
+                D4 ->
+                    C7
+
+                D4b ->
+                    C7b
+
+                B5o ->
+                    C3b
+
+                B5 ->
+                    C2b
+
+                D5 ->
+                    C2
+
+                B6o ->
+                    C5
+
+                B6 ->
+                    C3
+
+                D6 ->
+                    C5b
+
+                D6b ->
+                    C4
+
+                B7 ->
+                    C6
+
+                D7 ->
+                    C6b
+
+                D7o ->
+                    C7b
+
+                B8b ->
+                    C1
+
+                B8 ->
+                    C2b
+
+                D8 ->
+                    C7
+
+                B9b ->
+                    C3b
+
+                B9 ->
+                    C3
+
+                D9 ->
+                    C2
+
+                D9o ->
+                    C4
+
+                B10bb ->
+                    C5
+
+                B10b ->
+                    C6b
+
+                B10 ->
+                    C6
+
+                D10 ->
+                    C5b
+
+                D10o ->
+                    C7b
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ B1o, B4o, B8b ]
+
+                C2b ->
+                    [ B2, B5, B8 ]
+
+                C2 ->
+                    [ D2bb, D5, D9 ]
+
+                C3b ->
+                    [ D2b, B5o, B9b ]
+
+                C3 ->
+                    [ D2, B3, B6, B9 ]
+
+                C4 ->
+                    [ D3bbb, D6b, D9o ]
+
+                C5b ->
+                    [ D3bb, D6, D10 ]
+
+                C5 ->
+                    [ D3b, B6o, B10bb ]
+
+                C6b ->
+                    [ D3, D7, B10b ]
+
+                C6 ->
+                    [ B1, B4, B7, B10 ]
+
+                C7b ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C7 ->
+                    [ D1, D4, D8 ]
+    }
+
+
+eleventhPosition : Position
+eleventhPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C4
+
+                B1 ->
+                    C2
+
+                D1 ->
+                    C3
+
+                D1b ->
+                    C3b
+
+                B2 ->
+                    C5b
+
+                D2 ->
+                    C6
+
+                D2b ->
+                    C6b
+
+                D2bb ->
+                    C5
+
+                B3 ->
+                    C6
+
+                D3 ->
+                    C2b
+
+                D3b ->
+                    C1
+
+                D3bb ->
+                    C7
+
+                D3bbb ->
+                    C7b
+
+                B4o ->
+                    C4
+
+                B4 ->
+                    C2
+
+                D4 ->
+                    C3
+
+                D4b ->
+                    C3b
+
+                B5o ->
+                    C6b
+
+                B5 ->
+                    C5b
+
+                D5 ->
+                    C5
+
+                B6o ->
+                    C1
+
+                B6 ->
+                    C6
+
+                D6 ->
+                    C7
+
+                D6b ->
+                    C7b
+
+                B7 ->
+                    C2
+
+                D7 ->
+                    C2b
+
+                D7o ->
+                    C3b
+
+                B8b ->
+                    C4
+
+                B8 ->
+                    C5b
+
+                D8 ->
+                    C3
+
+                B9b ->
+                    C6b
+
+                B9 ->
+                    C6
+
+                D9 ->
+                    C5
+
+                D9o ->
+                    C7b
+
+                B10bb ->
+                    C1
+
+                B10b ->
+                    C2b
+
+                B10 ->
+                    C2
+
+                D10 ->
+                    C7
+
+                D10o ->
+                    C3b
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D3b, B6o, B10bb ]
+
+                C2b ->
+                    [ D3, D7, B10b ]
+
+                C2 ->
+                    [ B1, B4, B7, B10 ]
+
+                C3b ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C3 ->
+                    [ D1, D4, D8 ]
+
+                C4 ->
+                    [ B1o, B4o, B8b ]
+
+                C5b ->
+                    [ B2, B5, B8 ]
+
+                C5 ->
+                    [ D2bb, D5, D9 ]
+
+                C6b ->
+                    [ D2b, B5o, B9b ]
+
+                C6 ->
+                    [ D2, B3, B6, B9 ]
+
+                C7b ->
+                    [ D3bbb, D6b, D9o ]
+
+                C7 ->
+                    [ D3bb, D6, D10 ]
+    }
+
+
+twelfthPosition : Position
+twelfthPosition =
+    { toChromatic =
+        \note ->
+            case note of
+                B1o ->
+                    C7b
+
+                B1 ->
+                    C5
+
+                D1 ->
+                    C6
+
+                D1b ->
+                    C6b
+
+                B2 ->
+                    C7
+
+                D2 ->
+                    C2
+
+                D2b ->
+                    C2b
+
+                D2bb ->
+                    C1
+
+                B3 ->
+                    C2
+
+                D3 ->
+                    C5b
+
+                D3b ->
+                    C4
+
+                D3bb ->
+                    C3
+
+                D3bbb ->
+                    C3b
+
+                B4o ->
+                    C7b
+
+                B4 ->
+                    C5
+
+                D4 ->
+                    C6
+
+                D4b ->
+                    C6b
+
+                B5o ->
+                    C2b
+
+                B5 ->
+                    C7
+
+                D5 ->
+                    C1
+
+                B6o ->
+                    C4
+
+                B6 ->
+                    C2
+
+                D6 ->
+                    C3
+
+                D6b ->
+                    C3b
+
+                B7 ->
+                    C5
+
+                D7 ->
+                    C5b
+
+                D7o ->
+                    C6b
+
+                B8b ->
+                    C7b
+
+                B8 ->
+                    C7
+
+                D8 ->
+                    C6
+
+                B9b ->
+                    C2b
+
+                B9 ->
+                    C2
+
+                D9 ->
+                    C1
+
+                D9o ->
+                    C3b
+
+                B10bb ->
+                    C4
+
+                B10b ->
+                    C5b
+
+                B10 ->
+                    C5
+
+                D10 ->
+                    C3
+
+                D10o ->
+                    C6b
+    , fromChromatic =
+        \chromatic ->
+            case chromatic of
+                C1 ->
+                    [ D2bb, D5, D9 ]
+
+                C2b ->
+                    [ D2b, B5o, B9b ]
+
+                C2 ->
+                    [ D2, B3, B6, B9 ]
+
+                C3b ->
+                    [ D3bbb, D6b, D9o ]
+
+                C3 ->
+                    [ D3bb, D6, D10 ]
+
+                C4 ->
+                    [ D3b, B6o, B10bb ]
+
+                C5b ->
+                    [ D3, D7, B10b ]
+
+                C5 ->
+                    [ B1, B4, B7, B10 ]
+
+                C6b ->
+                    [ D1b, D4b, D7o, D10o ]
+
+                C6 ->
+                    [ D1, D4, D8 ]
+
+                C7b ->
+                    [ B1o, B4o, B8b ]
+
+                C7 ->
+                    [ B2, B5, B8 ]
     }
 
 
