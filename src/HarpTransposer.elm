@@ -1,4 +1,12 @@
-module HarpTransposer exposing (Content, Flags, Model, Msg, Position, main)
+module HarpTransposer exposing
+    ( Content
+    , Flags
+    , HarmnonicaKey
+    , Model
+    , Msg
+    , Position
+    , main
+    )
 
 import AssocList as Dict exposing (Dict)
 import Browser
@@ -34,6 +42,61 @@ type Position
     | TwelfthPos
 
 
+type HarmnonicaKey
+    = G
+    | Ab
+    | A
+    | Bb
+    | B
+    | C
+    | Db
+    | D
+    | Eb
+    | E
+    | F
+    | Gb
+
+
+keyToString : HarmnonicaKey -> String
+keyToString key =
+    case key of
+        G ->
+            "G"
+
+        Ab ->
+            "Ab/G#"
+
+        A ->
+            "A"
+
+        Bb ->
+            "Bb/A#"
+
+        B ->
+            "B"
+
+        C ->
+            "C"
+
+        Db ->
+            "Db/C#"
+
+        D ->
+            "D"
+
+        Eb ->
+            "Eb/D#"
+
+        E ->
+            "E"
+
+        F ->
+            "F"
+
+        Gb ->
+            "Gb/F#"
+
+
 allPositions : List ( String, Position )
 allPositions =
     [ ( "1st", FirstPos )
@@ -49,6 +112,30 @@ allPositions =
     , ( "11th", EleventhPos )
     , ( "12th", TwelfthPos )
     ]
+
+
+allHarmonicaKeys : List ( String, HarmnonicaKey )
+allHarmonicaKeys =
+    [ G
+    , Ab
+    , A
+    , Bb
+    , B
+    , C
+    , Db
+    , D
+    , Eb
+    , E
+    , F
+    , Gb
+    ]
+        |> List.map
+            (\key -> ( keyToString key, key ))
+
+
+circleOf5th : List HarmnonicaKey
+circleOf5th =
+    [ C, G, D, A, E, B, Gb, Db, Ab, Eb, Bb, F ]
 
 
 toMusicPosition : Position -> Music.Position
@@ -92,7 +179,7 @@ toMusicPosition position =
 
 
 type alias Model =
-    { from : Position
+    { from : { key : HarmnonicaKey, position : Position }
     , to : Position
     , content : Content
     , edits : Dict Int ( Music.HarmonicaNote, Music.HarmonicaNote )
@@ -128,7 +215,7 @@ contentFromRawLick rawLick =
 
 type Msg
     = NewContent String
-    | ChangeFrom Position
+    | ChangeFrom { key : HarmnonicaKey, position : Position }
     | ChangeTo Position
     | Edit (Maybe Int)
     | UpdateTransposedNoteEdition Int ( Music.HarmonicaNote, Music.HarmonicaNote ) Bool
@@ -149,7 +236,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
-    ( { from = FirstPos
+    ( { from = { key = C, position = FirstPos }
       , to = SecondPos
       , content = contentFromRawLick ""
       , edits = Dict.empty
@@ -308,6 +395,42 @@ introPage =
         ]
 
 
+type alias SelectorConfig stuff =
+    { selected : stuff
+    , all : List ( String, stuff )
+    , toMsg : stuff -> Msg
+    , placeholder : String
+    }
+
+
+selector : SelectorConfig stuff -> Html Msg
+selector { selected, all, toMsg, placeholder } =
+    let
+        mapper : String -> Msg
+        mapper name =
+            all
+                |> List.find (\( label, _ ) -> label == name)
+                |> Maybe.unwrap selected Tuple.second
+                |> toMsg
+    in
+    select
+        [ Evt.onInput mapper
+        , css [ Tw.bg_color Theme.white, Tw.py_2, Tw.px_4 ]
+        ]
+    <|
+        option [ Attr.disabled True ] [ text placeholder ]
+            :: (all
+                    |> List.map
+                        (\( label, stuff ) ->
+                            option
+                                [ Attr.value label
+                                , Attr.selected <| stuff == selected
+                                ]
+                                [ text label ]
+                        )
+               )
+
+
 inputPage : Model -> Html Msg
 inputPage { content, from } =
     div
@@ -338,8 +461,24 @@ inputPage { content, from } =
             [ h2 [ css [ Tw.text_color Theme.gray_800, Tw.text_2xl ] ] [ text "Input" ]
             , div [ css [] ]
                 [ label [ css [ Tw.flex, Tw.items_center, Tw.space_x_2 ] ]
+                    [ span [] [ text "Key of the harmonica" ]
+                    , selector
+                        { selected = from.key
+                        , all = allHarmonicaKeys
+                        , toMsg = \key -> ChangeFrom { from | key = key }
+                        , placeholder = "Key"
+                        }
+                    ]
+                ]
+            , div [ css [] ]
+                [ label [ css [ Tw.flex, Tw.items_center, Tw.space_x_2 ] ]
                     [ span [] [ text "Position of the lick" ]
-                    , positionSelector from ChangeFrom
+                    , selector
+                        { selected = from.position
+                        , all = allPositions
+                        , toMsg = \position -> ChangeFrom { from | position = position }
+                        , placeholder = "Position"
+                        }
                     ]
                 ]
             , textarea
@@ -353,36 +492,8 @@ inputPage { content, from } =
         ]
 
 
-positionSelector : Position -> (Position -> Msg) -> Html Msg
-positionSelector selectedPosition toMsg =
-    let
-        mapper : String -> Msg
-        mapper name =
-            allPositions
-                |> List.find (\( posName, _ ) -> posName == name)
-                |> Maybe.unwrap selectedPosition Tuple.second
-                |> toMsg
-    in
-    select
-        [ Evt.onInput mapper
-        , css [ Tw.bg_color Theme.white, Tw.py_2, Tw.px_4 ]
-        ]
-    <|
-        option [ Attr.disabled True ] [ text "Position" ]
-            :: (allPositions
-                    |> List.map
-                        (\( posName, position ) ->
-                            option
-                                [ Attr.value posName
-                                , Attr.selected <| position == selectedPosition
-                                ]
-                                [ text posName ]
-                        )
-               )
-
-
 outputPage : Model -> Html Msg
-outputPage ({ to } as model) =
+outputPage ({ from, to } as model) =
     div
         [ pageAttributes
         , css
@@ -412,8 +523,41 @@ outputPage ({ to } as model) =
             [ h2 [ css [ Tw.text_color Theme.gray_800, Tw.text_2xl ] ] [ text "Output" ]
             , div [ css [] ]
                 [ label [ css [ Tw.flex, Tw.items_center, Tw.space_x_2 ] ]
-                    [ span [] [ text "Targeted position" ]
-                    , positionSelector to ChangeTo
+                    [ span [] [ text "Targeted key & position" ]
+                    , selector
+                        { selected = to
+                        , all =
+                            let
+                                adjustedCircleOf5th : List HarmnonicaKey
+                                adjustedCircleOf5th =
+                                    circleOf5th
+                                        ++ circleOf5th
+                                        |> List.dropWhile ((/=) from.key)
+                                        |> List.splitAt 12
+                                        |> Tuple.first
+
+                                indexedPositions : List ( Int, ( String, Position ) )
+                                indexedPositions =
+                                    allPositions
+                                        |> List.indexedMap (\idx posAndName -> ( idx, posAndName ))
+
+                                adjustedAllPositons : List ( Int, ( String, Position ) )
+                                adjustedAllPositons =
+                                    indexedPositions
+                                        ++ indexedPositions
+                                        |> List.dropWhile (\( _, ( _, pos ) ) -> pos /= from.position)
+                                        |> List.splitAt 12
+                                        |> Tuple.first
+                            in
+                            List.zip adjustedCircleOf5th adjustedAllPositons
+                                |> List.sortBy (\( _, ( index, _ ) ) -> index)
+                                |> List.map
+                                    (\( key, ( _, ( posName, pos ) ) ) ->
+                                        ( keyToString key ++ " (" ++ posName ++ " pos)", pos )
+                                    )
+                        , toMsg = ChangeTo
+                        , placeholder = "Key & position"
+                        }
                     ]
                 ]
             , viewEditsControl model
@@ -556,7 +700,7 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
                 candidateLick : TransposedLick
                 candidateLick =
                     lick
-                        |> Music.transpose (from |> toMusicPosition) (to |> toMusicPosition)
+                        |> Music.transpose (from.position |> toMusicPosition) (to |> toMusicPosition)
                         |> applyEdits globalEdits edits
             in
             div [ css [ Tw.bg_color Theme.white, Tw.whitespace_pre, Tw.p_5, Tw.flex_grow, Tw.h_0, Tw.overflow_auto ] ]

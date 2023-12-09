@@ -29,6 +29,8 @@ While there might be a dedicated UI to change to another octave directly, for no
 
 ### Version 2
 
+- [ ] on the input page put 2 selectors: one for Key, one for position (optional).
+  - [ ] on the output page show a selector that is the combination of both key and position.
 - [ ] Change the colours everywhere...
 - [ ] Input UI with colour support for recognised harmonica notes
 - [ ] Easier edition of the translation
