@@ -135,7 +135,7 @@ allHarmonicaKeys =
 
 circleOf5th : List HarmnonicaKey
 circleOf5th =
-    [ C, G, D, A, E, B, Gb, Db, Ab, Eb, Bb, F ]
+    [ F, Bb, Eb, Ab, Db, Gb, B, E, A, D, G, C ]
 
 
 toMusicPosition : Position -> Music.Position
