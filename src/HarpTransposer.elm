@@ -1,10 +1,8 @@
 module HarpTransposer exposing
     ( Content
     , Flags
-    , HarmnonicaKey
     , Model
     , Msg
-    , Position
     , main
     )
 
@@ -27,160 +25,9 @@ type alias Flags =
     ()
 
 
-type Position
-    = FirstPos
-    | SecondPos
-    | ThirdPos
-    | FourthPos
-    | FifthPos
-    | SixthPos
-    | SeventhPos
-    | EighthPos
-    | NinthPos
-    | TenthPos
-    | EleventhPos
-    | TwelfthPos
-
-
-type HarmnonicaKey
-    = G
-    | Ab
-    | A
-    | Bb
-    | B
-    | C
-    | Db
-    | D
-    | Eb
-    | E
-    | F
-    | Gb
-
-
-keyToString : HarmnonicaKey -> String
-keyToString key =
-    case key of
-        G ->
-            "G"
-
-        Ab ->
-            "Ab/G#"
-
-        A ->
-            "A"
-
-        Bb ->
-            "Bb/A#"
-
-        B ->
-            "B"
-
-        C ->
-            "C"
-
-        Db ->
-            "Db/C#"
-
-        D ->
-            "D"
-
-        Eb ->
-            "Eb/D#"
-
-        E ->
-            "E"
-
-        F ->
-            "F"
-
-        Gb ->
-            "Gb/F#"
-
-
-allPositions : List ( String, Position )
-allPositions =
-    [ ( "1st", FirstPos )
-    , ( "2nd", SecondPos )
-    , ( "3rd", ThirdPos )
-    , ( "4th", FourthPos )
-    , ( "5th", FifthPos )
-    , ( "6th", SixthPos )
-    , ( "7th", SeventhPos )
-    , ( "8th", EighthPos )
-    , ( "9th", NinthPos )
-    , ( "10th", TenthPos )
-    , ( "11th", EleventhPos )
-    , ( "12th", TwelfthPos )
-    ]
-
-
-allHarmonicaKeys : List ( String, HarmnonicaKey )
-allHarmonicaKeys =
-    [ G
-    , Ab
-    , A
-    , Bb
-    , B
-    , C
-    , Db
-    , D
-    , Eb
-    , E
-    , F
-    , Gb
-    ]
-        |> List.map
-            (\key -> ( keyToString key, key ))
-
-
-circleOf5th : List HarmnonicaKey
-circleOf5th =
-    [ F, Bb, Eb, Ab, Db, Gb, B, E, A, D, G, C ]
-
-
-toMusicPosition : Position -> Music.Position
-toMusicPosition position =
-    case position of
-        FirstPos ->
-            Music.firstPosition
-
-        SecondPos ->
-            Music.secondPosition
-
-        ThirdPos ->
-            Music.thirdPosition
-
-        FourthPos ->
-            Music.fourthPosition
-
-        FifthPos ->
-            Music.fifthPosition
-
-        SixthPos ->
-            Music.sixthPosition
-
-        SeventhPos ->
-            Music.seventhPosition
-
-        EighthPos ->
-            Music.eighthPosition
-
-        NinthPos ->
-            Music.ninthPosition
-
-        TenthPos ->
-            Music.tenthPosition
-
-        EleventhPos ->
-            Music.eleventhPosition
-
-        TwelfthPos ->
-            Music.twelfthPosition
-
-
 type alias Model =
-    { from : { key : HarmnonicaKey, position : Position }
-    , to : Position
+    { from : { key : Music.HarmnonicaKey, position : Music.Position }
+    , to : Music.Position
     , content : Content
     , edits : Dict Int ( Music.HarmonicaNote, Music.HarmonicaNote )
     , globalEdits : Dict Music.HarmonicaNote Music.HarmonicaNote
@@ -215,8 +62,8 @@ contentFromRawLick rawLick =
 
 type Msg
     = NewContent String
-    | ChangeFrom { key : HarmnonicaKey, position : Position }
-    | ChangeTo Position
+    | ChangeFrom { key : Music.HarmnonicaKey, position : Music.Position }
+    | ChangeTo Music.Position
     | Edit (Maybe Int)
     | UpdateTransposedNoteEdition Int ( Music.HarmonicaNote, Music.HarmonicaNote ) Bool
     | ToggleGlobalEdit Bool
@@ -236,8 +83,8 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
-    ( { from = { key = C, position = FirstPos }
-      , to = SecondPos
+    ( { from = { key = Music.C, position = Music.FirstPos }
+      , to = Music.SecondPos
       , content = contentFromRawLick ""
       , edits = Dict.empty
       , globalEdits = Dict.empty
@@ -464,7 +311,7 @@ inputPage { content, from } =
                     [ span [] [ text "Key of the harmonica" ]
                     , selector
                         { selected = from.key
-                        , all = allHarmonicaKeys
+                        , all = Music.allHarmonicaKeys
                         , toMsg = \key -> ChangeFrom { from | key = key }
                         , placeholder = "Key"
                         }
@@ -475,7 +322,7 @@ inputPage { content, from } =
                     [ span [] [ text "Position of the lick" ]
                     , selector
                         { selected = from.position
-                        , all = allPositions
+                        , all = Music.allPositions
                         , toMsg = \position -> ChangeFrom { from | position = position }
                         , placeholder = "Position"
                         }
@@ -527,34 +374,7 @@ outputPage ({ from, to } as model) =
                     , selector
                         { selected = to
                         , all =
-                            let
-                                adjustedCircleOf5th : List HarmnonicaKey
-                                adjustedCircleOf5th =
-                                    circleOf5th
-                                        ++ circleOf5th
-                                        |> List.dropWhile ((/=) from.key)
-                                        |> List.splitAt 12
-                                        |> Tuple.first
-
-                                indexedPositions : List ( Int, ( String, Position ) )
-                                indexedPositions =
-                                    allPositions
-                                        |> List.indexedMap (\idx posAndName -> ( idx, posAndName ))
-
-                                adjustedAllPositons : List ( Int, ( String, Position ) )
-                                adjustedAllPositons =
-                                    indexedPositions
-                                        ++ indexedPositions
-                                        |> List.dropWhile (\( _, ( _, pos ) ) -> pos /= from.position)
-                                        |> List.splitAt 12
-                                        |> Tuple.first
-                            in
-                            List.zip adjustedCircleOf5th adjustedAllPositons
-                                |> List.sortBy (\( _, ( index, _ ) ) -> index)
-                                |> List.map
-                                    (\( key, ( _, ( posName, pos ) ) ) ->
-                                        ( keyToString key ++ " (" ++ posName ++ " pos)", pos )
-                                    )
+                            Music.targetKeyAndPositon from
                         , toMsg = ChangeTo
                         , placeholder = "Key & position"
                         }
@@ -700,7 +520,7 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
                 candidateLick : TransposedLick
                 candidateLick =
                     lick
-                        |> Music.transpose (from.position |> toMusicPosition) (to |> toMusicPosition)
+                        |> Music.transpose (from.position |> Music.toMusicPosition) (to |> Music.toMusicPosition)
                         |> applyEdits globalEdits edits
             in
             div [ css [ Tw.bg_color Theme.white, Tw.whitespace_pre, Tw.p_5, Tw.flex_grow, Tw.h_0, Tw.overflow_auto ] ]

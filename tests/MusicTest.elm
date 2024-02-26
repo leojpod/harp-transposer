@@ -8,7 +8,9 @@ import Test exposing (Test, describe, test)
 all : Test
 all =
     describe "All tests regarding the Music module"
-        [ lickParser ]
+        [ lickParser
+        , targetKeyAndPositonTest
+        ]
 
 
 lickParser : Test
@@ -147,3 +149,60 @@ simpleTest name lick expectedResult =
         \_ ->
             parseLick lick
                 |> Expect.equal expectedResult
+
+
+targetKeyAndPositonTest : Test
+targetKeyAndPositonTest =
+    describe "targetKeyAndPositon"
+        [ test "C 1st -> [F 2nd, Bb 3rd ...]" <|
+            \() ->
+                Music.targetKeyAndPositon { key = Music.C, position = Music.FirstPos }
+                    |> Expect.equalLists
+                        [ ( "C (1st pos)", Music.FirstPos )
+                        , ( "F (2nd pos)", Music.SecondPos )
+                        , ( "Bb/A# (3rd pos)", Music.ThirdPos )
+                        , ( "Eb/D# (4th pos)", Music.FourthPos )
+                        , ( "Ab/G# (5th pos)", Music.FifthPos )
+                        , ( "Db/C# (6th pos)", Music.SixthPos )
+                        , ( "Gb/F# (7th pos)", Music.SeventhPos )
+                        , ( "B (8th pos)", Music.EighthPos )
+                        , ( "E (9th pos)", Music.NinthPos )
+                        , ( "A (10th pos)", Music.TenthPos )
+                        , ( "D (11th pos)", Music.EleventhPos )
+                        , ( "G (12th pos)", Music.TwelfthPos )
+                        ]
+        , test "C 2nd -> [F 3rd, Bb 4th ...]" <|
+            \() ->
+                Music.targetKeyAndPositon { key = Music.C, position = Music.SecondPos }
+                    |> Expect.equalLists
+                        [ ( "G (1st pos)", Music.FirstPos )
+                        , ( "C (2nd pos)", Music.SecondPos )
+                        , ( "F (3rd pos)", Music.ThirdPos )
+                        , ( "Bb/A# (4th pos)", Music.FourthPos )
+                        , ( "Eb/D# (5th pos)", Music.FifthPos )
+                        , ( "Ab/G# (6th pos)", Music.SixthPos )
+                        , ( "Db/C# (7th pos)", Music.SeventhPos )
+                        , ( "Gb/F# (8th pos)", Music.EighthPos )
+                        , ( "B (9th pos)", Music.NinthPos )
+                        , ( "E (10th pos)", Music.TenthPos )
+                        , ( "A (11th pos)", Music.EleventhPos )
+                        , ( "D (12th pos)", Music.TwelfthPos )
+                        ]
+        , test "C 3rd -> [F 4th, Bb 5th ...]" <|
+            \() ->
+                Music.targetKeyAndPositon { key = Music.C, position = Music.ThirdPos }
+                    |> Expect.equalLists
+                        [ ( "D (1st pos)", Music.FirstPos )
+                        , ( "G (2nd pos)", Music.SecondPos )
+                        , ( "C (3rd pos)", Music.ThirdPos )
+                        , ( "F (4th pos)", Music.FourthPos )
+                        , ( "Bb/A# (5th pos)", Music.FifthPos )
+                        , ( "Eb/D# (6th pos)", Music.SixthPos )
+                        , ( "Ab/G# (7th pos)", Music.SeventhPos )
+                        , ( "Db/C# (8th pos)", Music.EighthPos )
+                        , ( "Gb/F# (9th pos)", Music.NinthPos )
+                        , ( "B (10th pos)", Music.TenthPos )
+                        , ( "E (11th pos)", Music.EleventhPos )
+                        , ( "A (12th pos)", Music.TwelfthPos )
+                        ]
+        ]

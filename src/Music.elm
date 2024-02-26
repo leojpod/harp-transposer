@@ -1,12 +1,16 @@
 module Music exposing
     ( Chromatic
+    , HarmnonicaKey(..)
     , HarmonicaNote(..)
     , LickElement(..)
-    , Position
+    , Position(..)
     , TransposedLick
     , TransposedLickElement(..)
     , TransposedNote
     , WrittenLick
+    , allHarmonicaKeys
+    , allPositions
+    , circleOf5th
     , eighthPosition
     , eleventhPosition
     , fifthPosition
@@ -18,12 +22,16 @@ module Music exposing
     , secondPosition
     , seventhPosition
     , sixthPosition
+    , targetKeyAndPositon
     , tenthPosition
     , thirdPosition
+    , toMusicPosition
     , transpose
     , twelfthPosition
     )
 
+import List
+import List.Extra as List
 import Parser exposing ((|.), (|=), oneOf, succeed)
 
 
@@ -206,7 +214,7 @@ noteToString note =
             "-10°"
 
 
-type alias Position =
+type alias MusicPosition =
     { toChromatic : HarmonicaNote -> Chromatic
     , fromChromatic : Chromatic -> List HarmonicaNote
     }
@@ -507,7 +515,7 @@ annotationParser =
         )
 
 
-firstPosition : Position
+firstPosition : MusicPosition
 firstPosition =
     { toChromatic =
         \note ->
@@ -669,7 +677,7 @@ firstPosition =
     }
 
 
-secondPosition : Position
+secondPosition : MusicPosition
 secondPosition =
     { toChromatic =
         \note ->
@@ -831,7 +839,7 @@ secondPosition =
     }
 
 
-thirdPosition : Position
+thirdPosition : MusicPosition
 thirdPosition =
     { toChromatic =
         \note ->
@@ -993,7 +1001,7 @@ thirdPosition =
     }
 
 
-fourthPosition : Position
+fourthPosition : MusicPosition
 fourthPosition =
     { toChromatic =
         \note ->
@@ -1155,7 +1163,7 @@ fourthPosition =
     }
 
 
-fifthPosition : Position
+fifthPosition : MusicPosition
 fifthPosition =
     { toChromatic =
         \note ->
@@ -1317,7 +1325,7 @@ fifthPosition =
     }
 
 
-sixthPosition : Position
+sixthPosition : MusicPosition
 sixthPosition =
     { toChromatic =
         \note ->
@@ -1479,7 +1487,7 @@ sixthPosition =
     }
 
 
-seventhPosition : Position
+seventhPosition : MusicPosition
 seventhPosition =
     { toChromatic =
         \note ->
@@ -1641,7 +1649,7 @@ seventhPosition =
     }
 
 
-eighthPosition : Position
+eighthPosition : MusicPosition
 eighthPosition =
     { toChromatic =
         \note ->
@@ -1803,7 +1811,7 @@ eighthPosition =
     }
 
 
-ninthPosition : Position
+ninthPosition : MusicPosition
 ninthPosition =
     { toChromatic =
         \note ->
@@ -1965,7 +1973,7 @@ ninthPosition =
     }
 
 
-tenthPosition : Position
+tenthPosition : MusicPosition
 tenthPosition =
     { toChromatic =
         \note ->
@@ -2127,7 +2135,7 @@ tenthPosition =
     }
 
 
-eleventhPosition : Position
+eleventhPosition : MusicPosition
 eleventhPosition =
     { toChromatic =
         \note ->
@@ -2289,7 +2297,7 @@ eleventhPosition =
     }
 
 
-twelfthPosition : Position
+twelfthPosition : MusicPosition
 twelfthPosition =
     { toChromatic =
         \note ->
@@ -2466,7 +2474,7 @@ type TransposedLickElement
     | Annotation_ String
 
 
-transpose : Position -> Position -> WrittenLick -> TransposedLick
+transpose : MusicPosition -> MusicPosition -> WrittenLick -> TransposedLick
 transpose from to =
     List.map
         (\element ->
@@ -2482,6 +2490,228 @@ transpose from to =
         )
 
 
-transposeNote : Position -> Position -> HarmonicaNote -> List HarmonicaNote
+transposeNote : MusicPosition -> MusicPosition -> HarmonicaNote -> List HarmonicaNote
 transposeNote { toChromatic } { fromChromatic } note =
     toChromatic note |> fromChromatic
+
+
+type HarmnonicaKey
+    = G
+    | Ab
+    | A
+    | Bb
+    | B
+    | C
+    | Db
+    | D
+    | Eb
+    | E
+    | F
+    | Gb
+
+
+keyToString : HarmnonicaKey -> String
+keyToString key =
+    case key of
+        G ->
+            "G"
+
+        Ab ->
+            "Ab/G#"
+
+        A ->
+            "A"
+
+        Bb ->
+            "Bb/A#"
+
+        B ->
+            "B"
+
+        C ->
+            "C"
+
+        Db ->
+            "Db/C#"
+
+        D ->
+            "D"
+
+        Eb ->
+            "Eb/D#"
+
+        E ->
+            "E"
+
+        F ->
+            "F"
+
+        Gb ->
+            "Gb/F#"
+
+
+allHarmonicaKeys : List ( String, HarmnonicaKey )
+allHarmonicaKeys =
+    [ G
+    , Ab
+    , A
+    , Bb
+    , B
+    , C
+    , Db
+    , D
+    , Eb
+    , E
+    , F
+    , Gb
+    ]
+        |> List.map
+            (\key -> ( keyToString key, key ))
+
+
+circleOf5th : List HarmnonicaKey
+circleOf5th =
+    [ F, Bb, Eb, Ab, Db, Gb, B, E, A, D, G, C ]
+
+
+type Position
+    = FirstPos
+    | SecondPos
+    | ThirdPos
+    | FourthPos
+    | FifthPos
+    | SixthPos
+    | SeventhPos
+    | EighthPos
+    | NinthPos
+    | TenthPos
+    | EleventhPos
+    | TwelfthPos
+
+
+allPositions : List ( String, Position )
+allPositions =
+    [ ( "1st", FirstPos )
+    , ( "2nd", SecondPos )
+    , ( "3rd", ThirdPos )
+    , ( "4th", FourthPos )
+    , ( "5th", FifthPos )
+    , ( "6th", SixthPos )
+    , ( "7th", SeventhPos )
+    , ( "8th", EighthPos )
+    , ( "9th", NinthPos )
+    , ( "10th", TenthPos )
+    , ( "11th", EleventhPos )
+    , ( "12th", TwelfthPos )
+    ]
+
+
+toMusicPosition : Position -> MusicPosition
+toMusicPosition position =
+    case position of
+        FirstPos ->
+            firstPosition
+
+        SecondPos ->
+            secondPosition
+
+        ThirdPos ->
+            thirdPosition
+
+        FourthPos ->
+            fourthPosition
+
+        FifthPos ->
+            fifthPosition
+
+        SixthPos ->
+            sixthPosition
+
+        SeventhPos ->
+            seventhPosition
+
+        EighthPos ->
+            eighthPosition
+
+        NinthPos ->
+            ninthPosition
+
+        TenthPos ->
+            tenthPosition
+
+        EleventhPos ->
+            eleventhPosition
+
+        TwelfthPos ->
+            twelfthPosition
+
+
+targetKeyAndPositon : { key : HarmnonicaKey, position : Position } -> List ( String, Position )
+targetKeyAndPositon from =
+    let
+        positionOffset : Int
+        positionOffset =
+            case from.position of
+                FirstPos ->
+                    0
+
+                SecondPos ->
+                    1
+
+                ThirdPos ->
+                    2
+
+                FourthPos ->
+                    3
+
+                FifthPos ->
+                    4
+
+                SixthPos ->
+                    5
+
+                SeventhPos ->
+                    6
+
+                EighthPos ->
+                    7
+
+                NinthPos ->
+                    8
+
+                TenthPos ->
+                    9
+
+                EleventhPos ->
+                    10
+
+                TwelfthPos ->
+                    11
+
+        lickKey : HarmnonicaKey
+        lickKey =
+            (circleOf5th ++ circleOf5th)
+                |> List.reverse
+                |> List.dropWhile ((/=) from.key)
+                |> List.getAt positionOffset
+                |> Maybe.withDefault C
+
+        adjustedCircleOf5th : List HarmnonicaKey
+        adjustedCircleOf5th =
+            circleOf5th
+                ++ circleOf5th
+                |> List.dropWhile ((/=) lickKey)
+                |> List.splitAt 12
+                |> Tuple.first
+
+        indexedPositions : List ( Int, ( String, Position ) )
+        indexedPositions =
+            allPositions
+                |> List.indexedMap (\idx posAndName -> ( idx, posAndName ))
+    in
+    List.zip adjustedCircleOf5th indexedPositions
+        |> List.sortBy (\( _, ( index, _ ) ) -> index)
+        |> List.map
+            (\( key, ( _, ( posName, pos ) ) ) ->
+                ( keyToString key ++ " (" ++ posName ++ " pos)", pos )
+            )
