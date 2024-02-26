@@ -541,7 +541,7 @@ viewTransposedLick { content, from, to, edits, globalEdits, editing } =
 
 viewTransposedNote : { index : Int, editing : Maybe ( Int, Bool ) } -> TransposedNote -> Html Msg
 viewTransposedNote { index, editing } ({ original, options, selection } as transposedNote) =
-    div
+    span
         [ css [ Tw.relative, Tw.text_color Theme.violet_700, Tw.inline_block, Tw.cursor_pointer ]
         ]
     <|
@@ -626,7 +626,7 @@ viewTransposedNote { index, editing } ({ original, options, selection } as trans
                             Global note ->
                                 ( Theme.blue_50, note |> Music.noteToString )
                  in
-                 div
+                 span
                     [ css [ Tw.bg_color color, Tw.p_1, Tw.rounded_xl ]
                     , Evt.onClick <| Edit <| Just index
                     ]
